@@ -8,19 +8,12 @@ relative_permalinks: true
 
 # Setup
 title:            trydis' blog
-tagline:          ''
 description:      'Ramblings about .NET and mobile stuff'
 url:              http://trydis.github.io
 baseurl:          /
 
-author:
-  name:           'Morten Trydal'
-  url:            https://twitter.com/trydis
-
 paginate:         5
 
-# Custom vars
-#version:          2.1.0
-
-#github:
-#  repo:           https://github.com/poole/hyde
+# Twitter
+twitter_handle: trydis
+twitter_widget_id: 550443660773691394
