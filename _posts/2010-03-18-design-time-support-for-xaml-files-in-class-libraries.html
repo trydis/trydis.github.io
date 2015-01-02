@@ -1,0 +1,27 @@
+---
+layout: post
+title: Design-time support for XAML files in class libraries
+date: 2010-03-18 22:31:14.000000000 +01:00
+categories:
+- Expression Blend
+tags:
+- class libraries
+- silverlight
+- WPF
+status: publish
+type: post
+published: true
+meta:
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1335473929";}
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1368179554;}
+author:
+  login: trydal
+  email: trydis@hotmail.com
+  display_name: trydal
+  first_name: ''
+  last_name: ''
+---
+<p>One thing you’ll experience if you split your WPF/Silverlight applications into modules, for instance by following the <a href="http://compositewpf.codeplex.com/" target="_blank">Composite Application Guidance for WPF and Silverlight,</a> is the lack of design-time support for the modules which are split out into separate class libraries. In Expression Blend 3, you will only be able to edit the modules in XAML view, which is kind of annoying, since you’ll be missing out on many of the benefits the design view can offer.</p>
+<p>Luckily there’s something you can do to remedy this situation. The solution is easy, all you’ll have to do is to add one line in your module’s project file. Open the file in Notepad and add</p>
+<p><em>&lt;ProjectTypeGuids&gt;{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}&lt;/ProjectTypeGuids&gt;</em></p>
+<p>in the first property group. Expression Blend should now be able to load the design surface for you!</p>

@@ -1,0 +1,128 @@
+---
+layout: post
+title: Getting started with query notifications
+date: 2010-03-08 18:45:00.000000000 +01:00
+categories:
+- SqlDependency
+tags:
+- c#
+- caching
+- query notifications
+- sql
+- SqlDependency
+status: publish
+type: post
+published: true
+meta:
+  _edit_last: '12821776'
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1335444562";}
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1345337284;}
+author:
+  login: trydal
+  email: trydis@hotmail.com
+  display_name: trydal
+  first_name: ''
+  last_name: ''
+---
+<p>The <a href="http://msdn.microsoft.com/en-us/library/system.data.sqlclient.sqldependency(VS.100).aspx" target="_blank">SqlDependency class</a> was introduced in .NET 2.0, but still there are many developers not aware of this functionality, or many not using it because it can be somewhat cumbersome to make it work properly.</p>
+<p>This class gives you the ability to create a dependency between your application and SQL server 2005/2008, which in turn will notify your application whenever the result set of your query changes. This is ideal for scenarios that involve caching or where you normally would use some sort of polling mechanism. </p>
+<p>It’s worth that the applications that will benefit the most from query notifications are those that mostly read data and where updates are infrequent. This is because query notification introduces an overhead, as it has to check for active subscribers, and raise notifications, whenever the table data is altered.</p>
+<h2></h2>
+<h3>Database permissions</h3>
+<p>This is the part that causes most of the trouble for people trying to get query notifications working. It can be very hard to troubleshoot what’s wrong, because quite often you get no error message at all, stating what the possible cause is. The SQL statements below should make sure you’re good to go.</p>
+<p>Open up your query window and run the following command, to make sure you’re working against the correct database: </p></p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:e9a487df-99e6-40b8-87ad-ef31ddaa152e" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#ffffff;max-height:300px;overflow:auto;white-space:nowrap;padding:2px 5px;"><span style="color:#0000ff;">USE</span> DatabaseName</div>
+</p></div>
+</p></div></p>
+<p>The first thing you need to check is that the service broker on your SQL server is running. This is is done by running the command below, which should return “1”.</p></p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:89ea4462-4c41-4d86-905a-4a2a8e2657ac" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#ffffff;max-height:300px;overflow:auto;padding:2px 5px;"><span style="color:#0000ff;">SELECT</span> is_broker_enabled <span style="color:#0000ff;">FROM</span> <span style="color:#008000;">sys.databases</span> <span style="color:#0000ff;">where</span> <span style="color:#0000ff;">name</span> <span style="color:#808080;">=</span> <span style="color:#ff0000;">&#39;DatabaseName&#39;</span></div>
+</p></div>
+</p></div></p>
+<p>If the command above returned “0” you need to run the command below, then rerun the command above to make sure it now returns “1”:</p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:b04f266b-ccb1-4ffa-9547-3ce995a2b9c8" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#ffffff;max-height:300px;overflow:auto;white-space:nowrap;padding:2px 5px;"><span style="color:#0000ff;">ALTER</span> <span style="color:#0000ff;">DATABASE</span> DatabaseName <span style="color:#0000ff;">SET</span> ENABLE_BROKER</div>
+</p></div>
+</p></div>
+<p>Then you need to give the database user you’re going to use in your application some permissions, to allow it to create the needed procedure, queue and service:</p></p></p></p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:6420fb58-5ce4-47c5-8558-8a9e02b8b22f" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#ffffff;max-height:300px;overflow:auto;white-space:nowrap;padding:2px 5px;"><span style="color:#0000ff;">GRANT</span> <span style="color:#0000ff;">CREATE</span> <span style="color:#0000ff;">PROCEDURE</span> <span style="color:#0000ff;">TO</span> DatabaseUser<br /> <span style="color:#0000ff;">GRANT</span> <span style="color:#0000ff;">CREATE</span> <span style="color:#0000ff;">QUEUE</span> <span style="color:#0000ff;">TO</span> DatabaseUser<br /> <span style="color:#0000ff;">GRANT</span> <span style="color:#0000ff;">CREATE</span> <span style="color:#0000ff;">SERVICE</span> <span style="color:#0000ff;">TO</span> DatabaseUser</div>
+</p></div>
+</p></div></p>
+<p>You then need to allow your user to be able to subscribe to query notifications, by running the following command. Make sure that the database user is the same as you’re specifying in your connection string.</p></p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:561394c0-eb21-4bbd-9350-b6cfafc9533d" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#ffffff;max-height:300px;overflow:auto;white-space:nowrap;padding:2px 5px;"><span style="color:#0000ff;">GRANT</span> SUBSCRIBE QUERY NOTIFICATIONS <span style="color:#0000ff;">TO</span> DatabaseUser</div>
+</p></div>
+</p></div></p>
+<p>To successfully register a notification, the database user needs SELECT privileges on the table that it’s trying to query. You only need to do this if your login isn’t sysadmin or db_owner. The schema value below will for the majority of people be “dbo”. </p></p></p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:5c5d26fe-0e1e-47a3-a5f0-069fd7ca3ac0" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#ffffff;max-height:300px;overflow:auto;white-space:nowrap;padding:2px 5px;"><span style="color:#0000ff;">GRANT</span> <span style="color:#0000ff;">SELECT</span> <span style="color:#0000ff;">ON</span> OBJECT<span style="color:#808080;">::</span><span style="color:#0000ff;">Schema</span><span style="color:#808080;">.</span>TableName <span style="color:#0000ff;">TO</span> DatabaseUser</div>
+</p></div>
+</p></div></p>
+<p>The last permission you will have to give the database user is to allow it to receive notifications sent to the message queue by SQL server:</p></p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:f0e8f185-0ba2-4dd1-8a2b-bcbe82fdd347" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#ffffff;max-height:300px;overflow:auto;padding:2px 5px;"><span style="color:#0000ff;">GRANT</span> <span style="color:#0000ff;">RECEIVE</span> <span style="color:#0000ff;">ON</span> QueryNotificationErrorsQueue <span style="color:#0000ff;">TO</span> DatabaseUser</div>
+</p></div>
+</p></div></p>
+<p>To make sure that all the permissions have been granted, you can run the following command in the query window:</p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:a5bfaebd-a104-46e3-883f-fbf73b296612" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#ffffff;max-height:300px;overflow:auto;white-space:nowrap;padding:2px 5px;"><span style="color:#0000ff;">exec</span> <span style="color:#800000;">sp_helprotect</span> <span style="color:#808080;">NULL,</span> <span style="color:#ff0000;">&#39;DatabaseUser&#39;</span></div>
+</p></div>
+</p></div>
+<h3>Some code please!</h3>
+<p>In this example I’m going to create a simple console application that will receive query notifications. Exception handling is not implemented in this example, to keep it simple.</p>
+<p>The first thing we’re doing is checking that we’re allowed to request notifications. If we’re allowed to do that we start listening for notifications from the SQL server specified in the connection string. We then register our dependency, which is done by specifying an SQL query and associating an instance of the SqlDependency class with our SqlCommand instance. The code is shown below…   </p></p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:963c9235-3d44-45f5-be24-693661960f03" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#000000;max-height:300px;overflow:auto;white-space:nowrap;padding:2px 5px;"><span style="color:#cc7832;">static</span><span style="color:#ffffff;"> </span><span style="color:#cc7832;">void</span><span style="color:#ffffff;"> Main()</span><br /> <span style="color:#ffffff;">{</span><br /> <span style="color:#ffffff;">    </span><span style="color:#cc7832;">if</span><span style="color:#ffffff;"> (CanRequestNotifications())</span><br /> <span style="color:#ffffff;">    {</span><br /> <span style="color:#ffffff;">        </span><span style="color:#ffc66d;">SqlDependency</span><span style="color:#ffffff;">.Start(ConnectionString);</span></p>
+<p> <span style="color:#ffffff;">        </span><span style="color:#ffc66d;">Console</span><span style="color:#ffffff;">.WriteLine(</span><span style="color:#a5c25c;">&quot;Started the listener...&quot;</span><span style="color:#ffffff;">);</span></p>
+<p> <span style="color:#ffffff;">        RegisterDependency();</span></p>
+<p> <span style="color:#ffffff;">        </span><span style="color:#ffc66d;">Console</span><span style="color:#ffffff;">.WriteLine(</span><span style="color:#a5c25c;">&quot;Press enter to quit...&quot;</span><span style="color:#ffffff;">);</span><br /> <span style="color:#ffffff;">        </span><span style="color:#ffc66d;">Console</span><span style="color:#ffffff;">.ReadLine();</span></p>
+<p> <span style="color:#ffffff;">        </span><span style="color:#ffc66d;">Console</span><span style="color:#ffffff;">.WriteLine(</span><span style="color:#a5c25c;">&quot;Stopping the listener...&quot;</span><span style="color:#ffffff;">);</span></p>
+<p> <span style="color:#ffffff;">        </span><span style="color:#ffc66d;">SqlDependency</span><span style="color:#ffffff;">.Stop(ConnectionString);</span><br /> <span style="color:#ffffff;">    }</span><br /> <span style="color:#ffffff;">    </span><span style="color:#cc7832;">else</span><br /> <span style="color:#ffffff;">        </span><span style="color:#ffc66d;">Console</span><span style="color:#ffffff;">.WriteLine(</span><span style="color:#a5c25c;">&quot;Not allowed to request notifications!&quot;</span><span style="color:#ffffff;">);</span><br /> <span style="color:#ffffff;">}</span></div>
+</p></div>
+</p></div></p>
+<p>This method will return true if all the correct permissions are set.</p></p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:a4221a90-7318-4915-af71-2dc3eef48b95" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#000000;max-height:300px;overflow:auto;white-space:nowrap;padding:2px 5px;"><span style="color:#cc7832;">private</span><span style="color:#ffffff;"> </span><span style="color:#cc7832;">static</span><span style="color:#ffffff;"> </span><span style="color:#cc7832;">bool</span><span style="color:#ffffff;"> CanRequestNotifications()</span><br /> <span style="color:#ffffff;">{</span><br /> <span style="color:#ffffff;">    </span><span style="color:#ffc66d;">SqlClientPermission</span><span style="color:#ffffff;"> permission = </span><span style="color:#cc7832;">new</span><span style="color:#ffffff;"> </span><span style="color:#ffc66d;">SqlClientPermission</span><span style="color:#ffffff;">(</span><span style="color:#6897bb;">PermissionState</span><span style="color:#ffffff;">.Unrestricted);</span><br /> <span style="color:#ffffff;">    </span><span style="color:#cc7832;">try</span><br /> <span style="color:#ffffff;">    {</span><br /> <span style="color:#ffffff;">        permission.Demand();</span><br /> <span style="color:#ffffff;">        </span><span style="color:#cc7832;">return</span><span style="color:#ffffff;"> </span><span style="color:#cc7832;">true</span><span style="color:#ffffff;">;</span><br /> <span style="color:#ffffff;">    }</span><br /> <span style="color:#ffffff;">    </span><span style="color:#cc7832;">catch</span><span style="color:#ffffff;"> (</span><span style="color:#ffc66d;">Exception</span><span style="color:#ffffff;">)</span><br /> <span style="color:#ffffff;">    {</span><br /> <span style="color:#ffffff;">        </span><span style="color:#cc7832;">return</span><span style="color:#ffffff;"> </span><span style="color:#cc7832;">false</span><span style="color:#ffffff;">;</span><br /> <span style="color:#ffffff;">    }</span><br /> <span style="color:#ffffff;">}</span></div>
+</p></div>
+</p></div></p>
+<p>This method will register the dependency with the SQL server and hook up an event handler, which will be invoked whenever the result set of the SQL query you’ve specified has changed. There as some restrictions on what type of queries you can specify, read more about the limitations <a href="http://msdn.microsoft.com/en-us/library/ms181122.aspx" target="_blank">here</a>.</p></p></p>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:13dea05f-cccc-43e1-a0ef-c1d401e4f6d4" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#000000;max-height:300px;overflow:auto;white-space:nowrap;padding:2px 5px;"><span style="color:#cc7832;">private</span><span style="color:#ffffff;"> </span><span style="color:#cc7832;">static</span><span style="color:#ffffff;"> </span><span style="color:#cc7832;">void</span><span style="color:#ffffff;"> RegisterDependency()</span><br /> <span style="color:#ffffff;">{</span><br /> <span style="color:#ffffff;">    </span><span style="color:#cc7832;">using</span><span style="color:#ffffff;"> (</span><span style="color:#ffc66d;">SqlConnection</span><span style="color:#ffffff;"> connection = </span><span style="color:#cc7832;">new</span><span style="color:#ffffff;"> </span><span style="color:#ffc66d;">SqlConnection</span><span style="color:#ffffff;">(ConnectionString))</span><br /> <span style="color:#ffffff;">    {</span><br /> <span style="color:#ffffff;">        </span><span style="color:#ffc66d;">SqlCommand</span><span style="color:#ffffff;"> command = </span><span style="color:#cc7832;">new</span><span style="color:#ffffff;"> </span><span style="color:#ffc66d;">SqlCommand</span><span style="color:#ffffff;">(</span><span style="color:#a5c25c;">&quot;select Id from dbo.table&quot;</span><span style="color:#ffffff;">, connection) { Notification = </span><span style="color:#cc7832;">null</span><span style="color:#ffffff;"> };</span></p>
+<p> <span style="color:#ffffff;">        </span><span style="color:#ffc66d;">SqlDependency</span><span style="color:#ffffff;"> dependency = </span><span style="color:#cc7832;">new</span><span style="color:#ffffff;"> </span><span style="color:#ffc66d;">SqlDependency</span><span style="color:#ffffff;">(command);</span><br /> <span style="color:#ffffff;">        dependency.OnChange += DependencyOnChange;</span></p>
+<p> <span style="color:#ffffff;">        connection.Open();</span></p>
+<p> <span style="color:#ffffff;">        </span><span style="color:#ffc66d;">SqlDataReader</span><span style="color:#ffffff;"> dr = command.ExecuteReader(</span><span style="color:#6897bb;">CommandBehavior</span><span style="color:#ffffff;">.CloseConnection);</span></p>
+<p> <span style="color:#ffffff;">        </span><span style="color:#cc7832;">if</span><span style="color:#ffffff;"> (dr != </span><span style="color:#cc7832;">null</span><span style="color:#ffffff;">)</span><br /> <span style="color:#ffffff;">        {</span><br /> <span style="color:#ffffff;">            </span><span style="color:#808080;">// Cache or display the data if you need to</span></p>
+<p> <span style="color:#ffffff;">            dr.Close();</span><br /> <span style="color:#ffffff;">        }</span><br /> <span style="color:#ffffff;">    }</span><br /> <span style="color:#ffffff;">}</span></div>
+</p></div>
+</p></div></p>
+<p>This is the method that will be invoked whenever the result set of your query has changed. As you can see we need to unhook the event handler and then register a new one. </p>
+<p>A query notification will be sent if any of the following events occur:</p>
+<ul>
+<li>Rows contained in the query results may have changed. </li>
+<li>The subscription expires. </li>
+<li>The server restarts. </li>
+<li>The query notification subscription could not be created (for example, the SELECT statement does not conform to the requirements specified in <a href="http://msdn.microsoft.com/en-us/library/ms181122.aspx">Creating a Query for Notification</a>. </li>
+<li>The server is heavily loaded. </li>
+<li>Objects that the subscription depends on are dropped or modified.      </li>
+</ul>
+<div style="display:inline;float:none;margin:0;padding:0;" id="scid:9ce6104f-a9aa-4a17-a79f-3a39532ebf7c:646903df-ccc7-4cf6-8c63-9b41e0672541" class="wlWriterEditableSmartContent">
+<div style="border:#000080 1px solid;color:#000;font-family:'Courier New', Courier, Monospace;font-size:10pt;">
+<div style="background-color:#000000;max-height:300px;overflow:auto;white-space:nowrap;padding:2px 5px;"><span style="color:#cc7832;">private</span><span style="color:#ffffff;"> </span><span style="color:#cc7832;">static</span><span style="color:#ffffff;"> </span><span style="color:#cc7832;">void</span><span style="color:#ffffff;"> DependencyOnChange(</span><span style="color:#cc7832;">object</span><span style="color:#ffffff;"> sender, </span><span style="color:#ffc66d;">SqlNotificationEventArgs</span><span style="color:#ffffff;"> e)</span><br /> <span style="color:#ffffff;">{</span><br /> <span style="color:#ffffff;">    </span><span style="color:#ffc66d;">SqlDependency</span><span style="color:#ffffff;"> dependency = (</span><span style="color:#ffc66d;">SqlDependency</span><span style="color:#ffffff;">)sender;</span><br /> <span style="color:#ffffff;">    dependency.OnChange -= DependencyOnChange;</span></p>
+<p> <span style="color:#ffffff;">    </span><span style="color:#ffc66d;">Console</span><span style="color:#ffffff;">.WriteLine(</span><span style="color:#6897bb;">DateTime</span><span style="color:#ffffff;">.Now.ToLongTimeString() +</span><br /> <span style="color:#ffffff;">        </span><span style="color:#a5c25c;">&quot; Info:&quot;</span><span style="color:#ffffff;"> + e.Info +</span><br /> <span style="color:#ffffff;">        </span><span style="color:#a5c25c;">&quot; Type:&quot;</span><span style="color:#ffffff;"> + e.Type +</span><br /> <span style="color:#ffffff;">        </span><span style="color:#a5c25c;">&quot; Source:&quot;</span><span style="color:#ffffff;"> + e.Source);</span></p>
+<p> <span style="color:#ffffff;">    RegisterDependency();</span><br /> <span style="color:#ffffff;">}</span></div>
+</p></div>
+</p></div></p>
+<p>That’s it! You should now be able to enjoy the benefits of query notification in your own applications!</p>

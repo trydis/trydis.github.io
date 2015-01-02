@@ -1,0 +1,30 @@
+---
+layout: post
+title: Package 'Microsoft.VisualStudio.Xaml' has failed to load properly
+date: 2010-03-17 10:08:06.000000000 +01:00
+categories:
+- Visual Studio
+tags:
+- Express
+- Service pack
+- Windows Phone 7
+- WPF
+status: publish
+type: post
+published: true
+meta:
+  delicious: a:3:{s:5:"count";s:1:"0";s:9:"post_tags";s:0:"";s:4:"time";s:10:"1335463668";}
+  reddit: a:2:{s:5:"count";i:0;s:4:"time";i:1412731406;}
+author:
+  login: trydal
+  email: trydis@hotmail.com
+  display_name: trydal
+  first_name: ''
+  last_name: ''
+---
+<p>I just wanted to give you a heads up, in case you experience the same problem I faced yesterday. After installing the <a href="http://developer.windowsphone.com/windows-phone-7-series/" target="_blank">Windows Phone 7 developer tools</a> Visual Studio 2008 suddenly started giving me “Package Load Failure” errors when opening one of my WPF projects. </p>
+<p>Here’s what the error message looks like:</p>
+<p><em>Package Load Failure      <br />Package 'Microsoft.VisualStudio.Xaml' has failed to load properly ( GUID = {E58C2A8B-BCC4-4559-AD59-D62EB6D58A22} ). Please contact package vendor for assistance. Application restart is recommended, due to possible environment corruption. Would you like to disable loading this package in the future? You may use 'devenv /resetskippkgs' to re-enable package loading.</em> </p>
+<p></p>
+<p>The problem is related to the order in which you install the Express SKU and the Standard SKU, which can leave the system in a broken state.</p>
+<p>To fix this problem you can run the standalone <a href="http://www.microsoft.com/downloads/details.aspx?FamilyId=FBEE1648-7106-44A7-9649-6D9F6D58056E&amp;displaylang=en" target="_blank">Visual Studio 2008 Service Pack 1 installer</a>.</p>
