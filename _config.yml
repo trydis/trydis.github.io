@@ -7,9 +7,9 @@ permalink:        pretty
 relative_permalinks: true
 
 # Setup
-title:            trydis' blog
-description:      'Ramblings about .NET and mobile stuff'
-url:              http://trydis.github.io
+title:            trydis
+description:      'Ramblings on coding related topics'
+url:              https://trydis.github.io
 baseurl:          /
 
 paginate:         5
