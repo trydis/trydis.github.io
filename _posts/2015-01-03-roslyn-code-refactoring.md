@@ -2,6 +2,7 @@
 layout: post
 title: Roslyn - Creating an introduce and initialize field refactoring
 description: How to create a introduce and initialize field Roslyn refactoring.
+tags: roslyn refactoring
 ---
 Here I'll take a look at how we can create a [Roslyn](https://roslyn.codeplex.com/) code refactoring using [Visual Studio 2015 Preview](http://www.visualstudio.com/en-us/news/vs2015-preview-vs.aspx).
 

@@ -2,6 +2,7 @@
 layout: post
 title: Installing jekyll-import On Windows
 description: How to install jekyll-import and Jekyll on Windows.
+tags: jekyll ruby
 ---
 
 I already had an updated version of Ruby installed, thanks to [Chocolatey](https://chocolatey.org/), so I went ahead and ran:
