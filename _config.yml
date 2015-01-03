@@ -8,6 +8,7 @@ relative_permalinks: true
 
 # Setup
 title:            trydis
+tagline:          'Ramblings on coding related topics'
 description:      'Ramblings on coding related topics'
 url:              https://trydis.github.io
 baseurl:          /
