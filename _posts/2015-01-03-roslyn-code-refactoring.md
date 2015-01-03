@@ -11,7 +11,7 @@ We'll make a code refactoring that introduces and initializes a field, based on 
 
 Fire up Visual Studio, go to File -> New Project (CTRL + Shift + N) and pick "Code Refactoring (VSIX)" under "Extensibility":
 
-![File, new project](/assets/roslyn-refactoring-new-proj.png)
+![File, new project](/assets/roslyn-refactoring-new-proj.PNG)
 
 The newly created solution consists of two projects: 
 
@@ -26,7 +26,7 @@ If we look inside the "CodeRefactoringProvider.cs" file of the code refactoring 
 
 We can test/debug the default implementation by simply pressing F5, as with any other type of project. This will start an experimental instance of Visual Studio and deploy our VSIX content. We can then open a project, place our cursor on a class definition and click the light bulb (shortcut: CTRL + .). As we can see in the picture below the "Reverse type name" code refactoring is presented as well as a preview of the changes.
 
-![Code refactoring popup](/assets/roslyn-refactoring-default-popup.png)
+![Code refactoring popup](/assets/roslyn-refactoring-default-popup.PNG)
 
 ## Implementing our refactoring ##
 
@@ -145,7 +145,7 @@ Finally we insert the field declaration as the first member in our new class dec
 
 ## The final result ##
 
-![Code refactoring popup](/assets/roslyn-refactoring-new-popup.png)
+![Code refactoring popup](/assets/roslyn-refactoring-new-popup.PNG)
 
 The result will not put Resharper out of business any time soon, but I'm happy that it was quite easy to get started :-)
 
