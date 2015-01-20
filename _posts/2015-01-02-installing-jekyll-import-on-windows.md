@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Installing jekyll-import On Windows
+title: Installing jekyll-import and jekyll On Windows
 description: How to install jekyll-import and Jekyll on Windows.
 tags: jekyll ruby
 ---
@@ -42,7 +42,7 @@ C:\>cinst ruby2.devkit
 When installed I ran this to update the PATH:
 
 ```
-C:\>c:\bin\DevKit2\devkitvars.bat
+C:\>c:\tools\DevKit2\devkitvars.bat
 Adding the DevKit to PATH...
 ```
 
