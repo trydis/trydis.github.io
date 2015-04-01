@@ -1,5 +1,5 @@
 # Dependencies
-markdown:         redcarpet
+markdown:         kramdown
 highlighter:      pygments
 
 # Permalinks
@@ -18,3 +18,6 @@ paginate:         5
 # Twitter
 twitter_handle: trydis
 twitter_widget_id: 550443660773691394
+
+kramdown:
+  input: GFM
