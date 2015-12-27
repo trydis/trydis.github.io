@@ -16,7 +16,7 @@ I created a small Node.js command line tool which does following things:
 
 I can then change the version number in `version.txt` to `1.0.0-rc1`, `1.0.0` etc., build the project, and the assembly will have the correct version set. 
 
-# Extending the build process
+## Extending the build process
 
 The build process is extended by overriding the `CompileDependsOn` property and injecting the custom task before the original property.
 
@@ -37,7 +37,7 @@ The created file is also added to the build process.
 <Compile Include="$(IntermediateOutputPath)AssemblyVersion.cs" />
 ```
 
-# Extending the clean process
+## Extending the clean process
 
 MSBuild maintains a list of the files that should be removed when cleaning the project, in the item list `FileWrites`.
 
@@ -45,6 +45,6 @@ MSBuild maintains a list of the files that should be removed when cleaning the p
 <FileWrites Include="$(IntermediateOutputPath)AssemblyVersion.cs"/>
 ```
 
-# Source code and npm package
+## Source code and npm package
 [GitHub](<https://github.com/trydis/csversion>) 
 [npm package](<https://www.npmjs.com/package/csversion>) 
