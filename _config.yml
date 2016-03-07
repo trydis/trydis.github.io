@@ -4,7 +4,6 @@ highlighter:      pygments
 
 # Permalinks
 permalink:        pretty
-relative_permalinks: true
 
 # Setup
 title:            trydis
@@ -21,3 +20,5 @@ twitter_widget_id: 550443660773691394
 
 kramdown:
   input: GFM
+  
+gems: [jekyll-paginate, jemoji]
