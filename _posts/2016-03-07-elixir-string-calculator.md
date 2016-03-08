@@ -173,7 +173,7 @@ end
 
 This is what I came up with, excluding the function that handles empty strings:
 
-```exixir
+```elixir
 def add("//" <> rest) do
   [delimiter, numbers] = String.split(rest, "\n")
   add(numbers, [delimiter])
